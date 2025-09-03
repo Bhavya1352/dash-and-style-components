@@ -139,47 +139,44 @@ const ComponentDemo = () => {
   };
 
   return (
-    <div className="min-h-screen bg-mesh relative overflow-hidden">
-      {/* Enhanced animated background elements */}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-indigo-100 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 relative overflow-hidden">
+      {/* Mixed color animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-primary rounded-full blur-3xl animate-morph opacity-30"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-secondary rounded-full blur-3xl animate-float opacity-25" style={{animationDelay: '1s'}}></div>
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gradient-success rounded-full blur-2xl animate-pulse opacity-20" style={{animationDelay: '2s'}}></div>
-        <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-gradient-cosmic rounded-full blur-3xl animate-gradient opacity-15" style={{animationDelay: '3s'}}></div>
-        
-        {/* Floating particles */}
-        <div className="absolute top-20 left-20 w-2 h-2 bg-primary rounded-full animate-bounce-subtle" style={{animationDelay: '0.5s'}}></div>
-        <div className="absolute top-40 right-32 w-1 h-1 bg-accent rounded-full animate-bounce-subtle" style={{animationDelay: '1.2s'}}></div>
-        <div className="absolute bottom-32 left-1/3 w-3 h-3 bg-secondary rounded-full animate-bounce-subtle" style={{animationDelay: '2.1s'}}></div>
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-r from-purple-400/15 to-pink-400/15 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-indigo-400/10 to-blue-400/10 rounded-full blur-2xl animate-bounce-subtle" style={{animationDelay: '2s'}}></div>
       </div>
 
       <div className="relative z-10">
         {/* Enhanced Navigation */}
-        <nav className="glass sticky top-0 z-50 border-b custom-shadow">
+        <nav className="glass sticky top-0 z-50 border-b border-white/20 dark:border-gray-700/50">
           <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-            <div className="flex items-center space-x-3 hover-glow">
-              <div className="w-10 h-10 bg-gradient-cosmic rounded-xl flex items-center justify-center animate-gradient hover-tilt">
+            <div className="flex items-center space-x-3 hover-lift">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-xl flex items-center justify-center animate-gradient">
                 <Code className="w-5 h-5 text-white" />
               </div>
               <div className="flex flex-col">
-                <span className="font-bold text-xl bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent animate-shimmer">
+                <span className="font-bold text-xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   ComponentLib
                 </span>
-                <span className="text-xs text-muted-foreground font-medium tracking-wider">
-                  PROFESSIONAL EDITION
+                <span className="text-xs text-gray-500 dark:text-gray-400 font-medium tracking-wide">
+                  Professional Edition
                 </span>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-6">
               <div className="flex items-center space-x-2">
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="text-xs text-muted-foreground font-medium">LIVE</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">LIVE</span>
               </div>
-              <Badge variant="secondary" className="animate-pulse-glow bg-gradient-primary text-white border-0 hover-lift">
+              <Badge variant="secondary" className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 dark:from-blue-900/30 dark:to-purple-900/30 dark:text-blue-300 border-blue-200 dark:border-blue-800 animate-pulse-glow">
                 <Sparkles className="w-3 h-3 mr-1" />
-                v2.0 PRO
+                v2.0 Pro
               </Badge>
-              <ThemeToggle />
+              <div className="flex items-center space-x-3">
+                <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Theme:</span>
+                <ThemeToggle />
+              </div>
             </div>
           </div>
         </nav>
@@ -187,62 +184,60 @@ const ComponentDemo = () => {
         <div className="container mx-auto p-8 space-y-16">
           {/* Enhanced Hero Section */}
           <div className={`text-center space-y-12 ${isVisible ? 'animate-slide-in' : 'opacity-0'}`}>
-            <div className="space-y-6">
-              <div className="inline-flex items-center space-x-3 glass px-6 py-3 rounded-full text-sm font-semibold animate-float hover-glow">
-                <Rocket className="w-5 h-5 text-primary" />
-                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Next-Gen Component Library
-                </span>
-                <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+            <div className="space-y-8">
+              <div className="inline-flex items-center space-x-3 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 text-blue-700 dark:text-blue-300 px-6 py-3 rounded-full text-sm font-semibold animate-float hover-lift">
+                <Rocket className="w-4 h-4" />
+                <span>Next-Gen Component Library</span>
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
               </div>
               
               <div className="relative">
-                <h1 className="text-7xl md:text-8xl font-black bg-gradient-cosmic bg-clip-text text-transparent leading-tight animate-gradient">
+                <h1 className="text-6xl md:text-7xl font-bold text-gray-900 dark:text-white leading-tight">
                   Beautiful
                   <br />
-                  <span className="relative">
+                  <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent animate-gradient">
                     Components
-                    <div className="absolute -inset-1 bg-gradient-to-r from-primary to-accent blur opacity-30 animate-pulse"></div>
                   </span>
                 </h1>
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/20 to-purple-600/20 blur opacity-30 animate-pulse -z-10"></div>
               </div>
               
-              <p className="text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed font-light">
-                Handcrafted with <span className="text-primary font-semibold">precision</span> using TypeScript, Tailwind CSS, and modern React patterns.
+              <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
+                Crafted with <span className="text-blue-600 dark:text-blue-400 font-semibold">precision</span> using TypeScript, Tailwind CSS, and modern React patterns.
                 <br />
-                Experience the perfect blend of <span className="text-accent font-semibold">functionality</span> and <span className="text-secondary font-semibold">aesthetics</span>.
+                Experience the perfect blend of <span className="text-purple-600 dark:text-purple-400 font-semibold">functionality</span> and <span className="text-indigo-600 dark:text-indigo-400 font-semibold">aesthetics</span>.
               </p>
             </div>
             
-            <div className="flex flex-wrap justify-center gap-6 pt-8">
+            <div className="flex flex-wrap justify-center gap-6 pt-4">
               {[
-                { icon: Shield, text: 'Type Safe', color: 'bg-gradient-success', delay: '0s' },
-                { icon: Zap, text: 'Lightning Fast', color: 'bg-gradient-secondary', delay: '0.2s' },
-                { icon: Palette, text: 'Fully Customizable', color: 'bg-gradient-primary', delay: '0.4s' },
+                { icon: Shield, text: 'Type Safe', color: 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 dark:from-green-900/30 dark:to-emerald-900/30 dark:text-green-300', delay: '0s' },
+                { icon: Zap, text: 'Lightning Fast', color: 'bg-gradient-to-r from-yellow-100 to-orange-100 text-yellow-700 dark:from-yellow-900/30 dark:to-orange-900/30 dark:text-yellow-300', delay: '0.2s' },
+                { icon: Palette, text: 'Customizable', color: 'bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 dark:from-purple-900/30 dark:to-pink-900/30 dark:text-purple-300', delay: '0.4s' },
               ].map((feature, index) => (
                 <div 
                   key={index} 
-                  className={`flex items-center space-x-3 px-6 py-4 rounded-2xl ${feature.color} text-white font-semibold hover-lift hover-tilt glass animate-slide-in`}
+                  className={`flex items-center space-x-3 px-5 py-3 rounded-2xl ${feature.color} hover-lift font-semibold border border-white/50 dark:border-gray-700/50 animate-slide-in`}
                   style={{animationDelay: feature.delay}}
                 >
-                  <feature.icon className="w-6 h-6" />
-                  <span className="text-lg">{feature.text}</span>
+                  <feature.icon className="w-5 h-5" />
+                  <span>{feature.text}</span>
                 </div>
               ))}
             </div>
             
             {/* Stats */}
-            <div className="flex justify-center space-x-12 pt-8">
+            <div className="flex justify-center space-x-12 pt-6">
               {[
                 { label: 'Components', value: '2+' },
                 { label: 'Variants', value: '10+' },
                 { label: 'Tests', value: '25+' },
               ].map((stat, index) => (
                 <div key={index} className="text-center hover-lift">
-                  <div className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                     {stat.value}
                   </div>
-                  <div className="text-sm text-muted-foreground font-medium">{stat.label}</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -251,24 +246,24 @@ const ComponentDemo = () => {
           {/* InputField Demo */}
           <section className={`space-y-8 ${isVisible ? 'animate-slide-in' : 'opacity-0'}`} style={{animationDelay: '0.2s'}}>
             <div className="text-center space-y-4">
-              <h2 className="text-4xl font-bold text-foreground">InputField Component</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
+              <h2 className="text-4xl font-bold text-gray-900 dark:text-white">InputField Component</h2>
+              <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
                 Versatile input components with multiple variants, sizes, and interactive states
               </p>
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
               {/* Basic Examples */}
-              <Card className="hover-lift hover-tilt glass border-0 custom-shadow group">
+              <Card className="hover-lift glass border border-gradient-to-r from-blue-200/50 to-purple-200/50 dark:from-blue-700/50 dark:to-purple-700/50 group">
                 <CardHeader className="relative">
-                  <CardTitle className="flex items-center space-x-3">
-                    <div className="w-3 h-3 bg-gradient-primary rounded-full animate-pulse"></div>
-                    <span className="bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent font-bold">
+                  <CardTitle className="flex items-center space-x-3 text-gray-900 dark:text-white">
+                    <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
+                    <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-bold">
                       Basic Variants
                     </span>
                   </CardTitle>
-                  <CardDescription className="text-base">Different visual styles for various use cases</CardDescription>
-                  <div className="absolute top-2 right-2 w-8 h-8 bg-gradient-primary rounded-full opacity-10 group-hover:opacity-20 transition-opacity"></div>
+                  <CardDescription className="text-gray-600 dark:text-gray-400">Different visual styles for various use cases</CardDescription>
+                  <div className="absolute top-2 right-2 w-6 h-6 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full group-hover:scale-110 transition-transform"></div>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <InputField
@@ -295,16 +290,16 @@ const ComponentDemo = () => {
               </Card>
 
               {/* Sizes */}
-              <Card className="hover-lift hover-tilt glass border-0 custom-shadow group">
+              <Card className="hover-lift glass border border-gradient-to-r from-indigo-200/50 to-blue-200/50 dark:from-indigo-700/50 dark:to-blue-700/50 group">
                 <CardHeader className="relative">
-                  <CardTitle className="flex items-center space-x-3">
-                    <div className="w-3 h-3 bg-gradient-secondary rounded-full animate-pulse" style={{animationDelay: '0.5s'}}></div>
-                    <span className="bg-gradient-to-r from-foreground to-secondary bg-clip-text text-transparent font-bold">
+                  <CardTitle className="flex items-center space-x-3 text-gray-900 dark:text-white">
+                    <div className="w-3 h-3 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full animate-pulse" style={{animationDelay: '0.5s'}}></div>
+                    <span className="bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent font-bold">
                       Size Variants
                     </span>
                   </CardTitle>
-                  <CardDescription className="text-base">Flexible sizing options for different contexts</CardDescription>
-                  <div className="absolute top-2 right-2 w-8 h-8 bg-gradient-secondary rounded-full opacity-10 group-hover:opacity-20 transition-opacity"></div>
+                  <CardDescription className="text-gray-600 dark:text-gray-400">Flexible sizing options for different contexts</CardDescription>
+                  <div className="absolute top-2 right-2 w-6 h-6 bg-gradient-to-r from-indigo-500/20 to-blue-500/20 rounded-full group-hover:scale-110 transition-transform"></div>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <InputField
@@ -328,16 +323,16 @@ const ComponentDemo = () => {
               </Card>
 
               {/* States and Features */}
-              <Card className="hover-lift hover-tilt glass border-0 custom-shadow group">
+              <Card className="hover-lift glass border border-gradient-to-r from-green-200/50 to-emerald-200/50 dark:from-green-700/50 dark:to-emerald-700/50 group">
                 <CardHeader className="relative">
-                  <CardTitle className="flex items-center space-x-3">
-                    <div className="w-3 h-3 bg-gradient-success rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
-                    <span className="bg-gradient-to-r from-foreground to-accent bg-clip-text text-transparent font-bold">
+                  <CardTitle className="flex items-center space-x-3 text-gray-900 dark:text-white">
+                    <div className="w-3 h-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
+                    <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent font-bold">
                       Interactive States
                     </span>
                   </CardTitle>
-                  <CardDescription className="text-base">Advanced features and state management</CardDescription>
-                  <div className="absolute top-2 right-2 w-8 h-8 bg-gradient-success rounded-full opacity-10 group-hover:opacity-20 transition-opacity"></div>
+                  <CardDescription className="text-gray-600 dark:text-gray-400">Advanced features and state management</CardDescription>
+                  <div className="absolute top-2 right-2 w-6 h-6 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-full group-hover:scale-110 transition-transform"></div>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <InputField
@@ -368,13 +363,13 @@ const ComponentDemo = () => {
                     onClear={() => setSearch('')}
                   />
                   
-                  <Button 
+                  <button 
                     onClick={handleSearch}
-                    className="w-full bg-gradient-cosmic hover:opacity-90 transition-all duration-300 hover-lift hover-glow text-white font-semibold py-3 rounded-xl"
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 hover-lift animate-gradient"
                   >
-                    <Zap className="w-5 h-5 mr-2" />
+                    <Zap className="w-4 h-4 mr-2 inline" />
                     Trigger Loading Effect
-                  </Button>
+                  </button>
                   
                   <InputField
                     label="Disabled Input"
@@ -397,8 +392,8 @@ const ComponentDemo = () => {
           {/* DataTable Demo */}
           <section className={`space-y-8 ${isVisible ? 'animate-slide-in' : 'opacity-0'}`} style={{animationDelay: '0.4s'}}>
             <div className="text-center space-y-4">
-              <h2 className="text-4xl font-bold text-foreground">DataTable Component</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
+              <h2 className="text-4xl font-bold text-gray-900 dark:text-white">DataTable Component</h2>
+              <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
                 Advanced data table with sorting, selection, and beautiful rendering
               </p>
             </div>
@@ -421,8 +416,8 @@ const ComponentDemo = () => {
               </Button>
             </div>
 
-            <Card className="hover-lift hover-tilt glass border-0 custom-shadow group overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-primary opacity-5 group-hover:opacity-10 transition-opacity"></div>
+            <Card className="hover-lift glass border border-gradient-to-r from-blue-200/50 to-purple-200/50 dark:from-blue-700/50 dark:to-purple-700/50 group overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 group-hover:from-blue-500/10 group-hover:to-purple-500/10 transition-all"></div>
               <CardContent className="p-0 relative z-10">
                 <DataTable
                   data={sampleUsers}
@@ -437,31 +432,31 @@ const ComponentDemo = () => {
 
             {/* Selected Users Display */}
             {selectedUsers.length > 0 && (
-              <Card className="glass border-0 custom-shadow animate-slide-in hover-lift group">
+              <Card className="glass border border-gradient-to-r from-blue-200/50 to-purple-200/50 dark:from-blue-700/50 dark:to-purple-700/50 animate-slide-in hover-lift group">
                 <CardHeader className="relative">
-                  <CardTitle className="text-xl bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent font-bold">
+                  <CardTitle className="text-lg bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-bold">
                     Selected Users ({selectedUsers.length})
                   </CardTitle>
-                  <div className="absolute top-2 right-2 w-6 h-6 bg-gradient-primary rounded-full opacity-20 group-hover:opacity-40 transition-opacity"></div>
+                  <div className="absolute top-2 right-2 w-4 h-4 bg-gradient-to-r from-blue-500/30 to-purple-500/30 rounded-full group-hover:scale-110 transition-transform"></div>
                 </CardHeader>
                 <CardContent>
                   <div className="grid gap-3">
                     {selectedUsers.map((user, index) => (
                       <div 
                         key={user.id} 
-                        className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-muted/30 to-muted/10 hover-lift hover-glow border border-muted/20 animate-slide-in"
+                        className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gray-50/80 to-blue-50/80 dark:from-gray-800/50 dark:to-blue-900/20 hover-lift border border-blue-200/30 dark:border-blue-700/30 animate-slide-in"
                         style={{animationDelay: `${index * 0.1}s`}}
                       >
                         <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-gradient-primary rounded-full flex items-center justify-center text-white font-bold">
+                          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
                             {user.name.charAt(0)}
                           </div>
                           <div>
-                            <div className="font-semibold text-foreground">{user.name}</div>
-                            <div className="text-sm text-muted-foreground">{user.email}</div>
+                            <div className="font-semibold text-gray-900 dark:text-white">{user.name}</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
                           </div>
                         </div>
-                        <Badge variant="outline" className="bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20 font-medium">
+                        <Badge variant="outline" className="bg-gradient-to-r from-blue-100/50 to-purple-100/50 border-blue-300 dark:border-blue-600 font-medium">
                           {user.role}
                         </Badge>
                       </div>
@@ -475,10 +470,10 @@ const ComponentDemo = () => {
           {/* Empty Table Demo */}
           <section className={`space-y-8 ${isVisible ? 'animate-slide-in' : 'opacity-0'}`} style={{animationDelay: '0.6s'}}>
             <div className="text-center space-y-4">
-              <h3 className="text-3xl font-bold text-foreground">Empty State Demo</h3>
-              <p className="text-muted-foreground">Graceful handling of empty data sets</p>
+              <h3 className="text-3xl font-bold text-gray-900 dark:text-white">Empty State Demo</h3>
+              <p className="text-gray-600 dark:text-gray-400">Graceful handling of empty data sets</p>
             </div>
-            <Card className="hover-lift glass border-0 shadow-xl">
+            <Card className="hover-lift glass border border-gray-200/50 dark:border-gray-700/50">
               <CardContent className="p-0">
                 <DataTable
                   data={[]}
@@ -493,20 +488,20 @@ const ComponentDemo = () => {
           </section>
 
           {/* Enhanced Footer */}
-          <footer className="text-center py-16 space-y-8 relative">
-            <div className="absolute inset-0 bg-gradient-to-t from-muted/20 to-transparent rounded-t-3xl"></div>
+          <footer className="text-center py-16 space-y-6 relative">
+            <div className="absolute inset-0 bg-gradient-to-t from-blue-50/50 to-transparent dark:from-blue-900/20 rounded-t-3xl"></div>
             <div className="relative z-10">
               <div className="flex justify-center items-center space-x-3 text-lg font-medium">
-                <span className="text-muted-foreground">Crafted with</span>
-                <div className="w-6 h-6 bg-gradient-cosmic rounded-full animate-pulse"></div>
-                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent font-bold">
+                <span className="text-gray-600 dark:text-gray-400">Crafted with</span>
+                <div className="w-5 h-5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
+                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-bold">
                   passion & precision
                 </span>
               </div>
-              <p className="text-muted-foreground mt-4 text-lg">
+              <p className="text-gray-500 dark:text-gray-400 mt-4">
                 Showcasing modern React development practices
               </p>
-              <div className="flex justify-center space-x-8 mt-8 text-sm text-muted-foreground">
+              <div className="flex justify-center space-x-6 mt-6 text-sm text-gray-500 dark:text-gray-400">
                 <span>TypeScript</span>
                 <span>•</span>
                 <span>Tailwind CSS</span>
