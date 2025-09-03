@@ -1,8 +1,7 @@
-import React, { useState, forwardRef } from 'react';
-import { cn } from '@/lib/utils';
+import React, { useState } from 'react';
 import { Eye, EyeOff, X, Loader2 } from 'lucide-react';
 
-export interface InputFieldProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
+export interface InputFieldProps {
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   label?: string;
@@ -11,16 +10,18 @@ export interface InputFieldProps extends Omit<React.InputHTMLAttributes<HTMLInpu
   errorMessage?: string;
   disabled?: boolean;
   invalid?: boolean;
-  loading?: boolean;
   variant?: 'filled' | 'outlined' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
+  type?: string;
+  loading?: boolean;
   clearable?: boolean;
-  showPasswordToggle?: boolean;
   onClear?: () => void;
+  showPasswordToggle?: boolean;
+  className?: string;
 }
 
-const InputField = forwardRef<HTMLInputElement, InputFieldProps>(({
-  value,
+const InputField: React.FC<InputFieldProps> = ({
+  value = '',
   onChange,
   label,
   placeholder,
@@ -28,100 +29,60 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(({
   errorMessage,
   disabled = false,
   invalid = false,
-  loading = false,
   variant = 'outlined',
   size = 'md',
-  clearable = false,
-  showPasswordToggle = false,
-  onClear,
   type = 'text',
-  className,
-  ...props
-}, ref) => {
+  loading = false,
+  clearable = false,
+  onClear,
+  showPasswordToggle = false,
+  className = '',
+}) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
   const inputType = showPasswordToggle ? (showPassword ? 'text' : 'password') : type;
-  const hasError = invalid || !!errorMessage;
-  const hasValue = value && value.length > 0;
 
-  // Size variants
-  const sizeVariants = {
-    sm: {
-      container: 'text-sm',
-      input: 'h-8 px-3 text-sm',
-      label: 'text-xs',
-      helper: 'text-xs'
-    },
-    md: {
-      container: 'text-sm',
-      input: 'h-10 px-3 text-sm',
-      label: 'text-sm',
-      helper: 'text-sm'
-    },
-    lg: {
-      container: 'text-base',
-      input: 'h-12 px-4 text-base',
-      label: 'text-sm',
-      helper: 'text-sm'
-    }
+  const sizeClasses = {
+    sm: 'px-3 py-2 text-sm',
+    md: 'px-4 py-3 text-base',
+    lg: 'px-5 py-4 text-lg',
   };
 
-  // Variant styles
-  const variantStyles = {
-    filled: {
-      container: cn(
-        'bg-muted border border-transparent transition-all duration-200',
-        isFocused && 'bg-background border-ring shadow-sm',
-        hasError && 'border-destructive bg-destructive/5',
-        disabled && 'opacity-60 cursor-not-allowed'
-      ),
-      input: 'bg-transparent border-0 focus:ring-0 placeholder:text-muted-foreground'
-    },
-    outlined: {
-      container: cn(
-        'bg-background border border-input transition-all duration-200',
-        isFocused && 'border-ring shadow-sm',
-        hasError && 'border-destructive',
-        disabled && 'opacity-60 cursor-not-allowed bg-muted'
-      ),
-      input: 'bg-transparent border-0 focus:ring-0 placeholder:text-muted-foreground'
-    },
-    ghost: {
-      container: cn(
-        'bg-transparent border-0 border-b-2 border-input rounded-none transition-all duration-200',
-        isFocused && 'border-ring',
-        hasError && 'border-destructive',
-        disabled && 'opacity-60 cursor-not-allowed'
-      ),
-      input: 'bg-transparent border-0 focus:ring-0 placeholder:text-muted-foreground rounded-none'
-    }
+  const variantClasses = {
+    outlined: `border-2 bg-transparent ${
+      invalid 
+        ? 'border-red-500 focus:border-red-500' 
+        : isFocused 
+        ? 'border-blue-500' 
+        : 'border-gray-300 dark:border-gray-600'
+    }`,
+    filled: `border-0 ${
+      invalid 
+        ? 'bg-red-50 dark:bg-red-900/20' 
+        : 'bg-gray-100 dark:bg-gray-800'
+    }`,
+    ghost: `border-0 bg-transparent ${
+      invalid 
+        ? 'border-b-2 border-red-500' 
+        : isFocused 
+        ? 'border-b-2 border-blue-500' 
+        : 'border-b border-gray-300 dark:border-gray-600'
+    }`,
   };
-
-  const currentSize = sizeVariants[size];
-  const currentVariant = variantStyles[variant];
 
   return (
-    <div className={cn('space-y-2', currentSize.container, className)}>
+    <div className={`w-full ${className}`}>
       {label && (
-        <label 
-          className={cn(
-            'block font-medium transition-colors',
-            currentSize.label,
-            hasError ? 'text-destructive' : 'text-foreground',
-            disabled && 'opacity-60'
-          )}
-        >
+        <label className={`block text-sm font-medium mb-2 ${
+          invalid ? 'text-red-600 dark:text-red-400' : 'text-gray-700 dark:text-gray-300'
+        }`}>
           {label}
         </label>
       )}
       
-      <div className={cn(
-        'relative rounded-md',
-        currentVariant.container
-      )}>
+      <div className="relative">
         <input
-          ref={ref}
           type={inputType}
           value={value}
           onChange={onChange}
@@ -129,69 +90,64 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(({
           disabled={disabled || loading}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          className={cn(
-            'w-full transition-all duration-200 focus:outline-none',
-            currentSize.input,
-            currentVariant.input,
-            (clearable && hasValue) || showPasswordToggle || loading ? 'pr-10' : '',
-            disabled && 'cursor-not-allowed'
-          )}
-          {...props}
+          className={`
+            w-full rounded-lg transition-all duration-200 outline-none
+            ${sizeClasses[size]}
+            ${variantClasses[variant]}
+            ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-gray-400 dark:hover:border-gray-500'}
+            text-gray-900 dark:text-gray-100
+            placeholder-gray-500 dark:placeholder-gray-400
+            ${showPasswordToggle || clearable || loading ? 'pr-12' : ''}
+          `}
+          aria-invalid={invalid}
+          aria-describedby={helperText || errorMessage ? `${label}-help` : undefined}
         />
         
-        {/* Action buttons container */}
-        {((clearable && hasValue) || showPasswordToggle || loading) && (
-          <div className="absolute inset-y-0 right-0 flex items-center pr-3 space-x-1">
-            {loading && (
-              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-            )}
-            
-            {clearable && hasValue && !loading && (
-              <button
-                type="button"
-                onClick={() => {
-                  onClear?.();
-                  onChange?.({ target: { value: '' } } as React.ChangeEvent<HTMLInputElement>);
-                }}
-                disabled={disabled}
-                className="text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
-            
-            {showPasswordToggle && !loading && (
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                disabled={disabled}
-                className="text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
-              >
-                {showPassword ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
-              </button>
-            )}
+        {/* Loading spinner */}
+        {loading && (
+          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+            <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
           </div>
+        )}
+        
+        {/* Clear button */}
+        {clearable && value && !loading && (
+          <button
+            type="button"
+            onClick={onClear}
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            aria-label="Clear input"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
+        
+        {/* Password toggle */}
+        {showPasswordToggle && !loading && (
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+          >
+            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+          </button>
         )}
       </div>
       
       {/* Helper text or error message */}
       {(helperText || errorMessage) && (
-        <p className={cn(
-          'transition-colors',
-          currentSize.helper,
-          hasError ? 'text-destructive' : 'text-muted-foreground'
-        )}>
-          {errorMessage || helperText}
+        <p
+          id={`${label}-help`}
+          className={`mt-2 text-sm ${
+            invalid ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400'
+          }`}
+        >
+          {invalid ? errorMessage : helperText}
         </p>
       )}
     </div>
   );
-});
-
-InputField.displayName = 'InputField';
+};
 
 export default InputField;

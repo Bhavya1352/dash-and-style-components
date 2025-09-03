@@ -1,54 +1,26 @@
 import type { Meta, StoryObj } from '@storybook/react';
-// import { action } from '@storybook/addon-actions';
-import InputField from '../components/InputField';
+import { InputField } from '../components';
 
 const meta: Meta<typeof InputField> = {
   title: 'Components/InputField',
   component: InputField,
   parameters: {
     layout: 'centered',
-    docs: {
-      description: {
-        component: 'A flexible input component with validation states, multiple variants, and additional features like password toggle and clear button.',
-      },
-    },
   },
   tags: ['autodocs'],
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['filled', 'outlined', 'ghost'],
-      description: 'Visual style variant of the input',
+      options: ['outlined', 'filled', 'ghost'],
     },
     size: {
       control: { type: 'select' },
       options: ['sm', 'md', 'lg'],
-      description: 'Size of the input field',
     },
-    disabled: {
-      control: 'boolean',
-      description: 'Whether the input is disabled',
+    type: {
+      control: { type: 'select' },
+      options: ['text', 'email', 'password', 'number'],
     },
-    invalid: {
-      control: 'boolean',
-      description: 'Whether the input is in an invalid state',
-    },
-    loading: {
-      control: 'boolean',
-      description: 'Whether to show loading state',
-    },
-    clearable: {
-      control: 'boolean',
-      description: 'Whether to show clear button when input has value',
-    },
-    showPasswordToggle: {
-      control: 'boolean',
-      description: 'Whether to show password visibility toggle',
-    },
-  },
-  args: {
-    // onChange: action('onChange'),
-    // onClear: action('onClear'),
   },
 };
 
@@ -57,15 +29,15 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    label: 'Email Address',
+    label: 'Email',
     placeholder: 'Enter your email',
-    helperText: 'We never share your email with anyone else.',
+    helperText: 'We will never share your email',
   },
 };
 
 export const Variants: Story = {
   render: () => (
-    <div className="space-y-6 w-80">
+    <div className="space-y-4 w-80">
       <InputField
         label="Outlined (Default)"
         placeholder="Enter text..."
@@ -87,7 +59,7 @@ export const Variants: Story = {
 
 export const Sizes: Story = {
   render: () => (
-    <div className="space-y-6 w-80">
+    <div className="space-y-4 w-80">
       <InputField
         label="Small"
         placeholder="Small input"
@@ -109,75 +81,51 @@ export const Sizes: Story = {
 
 export const States: Story = {
   render: () => (
-    <div className="space-y-6 w-80">
+    <div className="space-y-4 w-80">
       <InputField
-        label="Normal State"
-        placeholder="Enter text..."
-        helperText="This is helper text"
+        label="Normal"
+        placeholder="Normal state"
       />
       <InputField
-        label="Disabled State"
-        placeholder="Disabled input"
+        label="Disabled"
+        placeholder="Disabled state"
         disabled
-        helperText="This input is disabled"
       />
       <InputField
-        label="Error State"
-        placeholder="Enter valid data"
+        label="Loading"
+        placeholder="Loading state"
+        loading
+      />
+      <InputField
+        label="Error"
+        placeholder="Error state"
         invalid
         errorMessage="This field is required"
       />
-      <InputField
-        label="Loading State"
-        placeholder="Loading..."
-        loading
-        helperText="Processing your request"
-      />
     </div>
   ),
 };
 
-export const Features: Story = {
+export const WithFeatures: Story = {
   render: () => (
-    <div className="space-y-6 w-80">
+    <div className="space-y-4 w-80">
       <InputField
-        label="With Clear Button"
+        label="Clearable"
         placeholder="Type something..."
         clearable
-        defaultValue="Clear me!"
+        onClear={() => console.log('Cleared')}
       />
       <InputField
-        label="Password Input"
+        label="Password"
         placeholder="Enter password"
         showPasswordToggle
-        defaultValue="secretpassword"
       />
       <InputField
-        label="Search Input"
-        placeholder="Search..."
-        clearable
-        loading
-        defaultValue="Searching..."
+        label="Email with validation"
+        type="email"
+        placeholder="user@example.com"
+        helperText="Enter a valid email address"
       />
     </div>
   ),
-};
-
-export const ErrorState: Story = {
-  args: {
-    label: 'Username',
-    placeholder: 'Enter username',
-    invalid: true,
-    errorMessage: 'Username must be at least 3 characters long',
-    defaultValue: 'ab',
-  },
-};
-
-export const PasswordField: Story = {
-  args: {
-    label: 'Password',
-    placeholder: 'Enter your password',
-    showPasswordToggle: true,
-    defaultValue: 'mysecretpassword',
-  },
 };

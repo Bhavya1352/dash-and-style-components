@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-// import { action } from '@storybook/addon-actions';
-import DataTable from '../components/DataTable';
-import type { Column } from '../components/DataTable';
+import { DataTable } from '../components';
+import type { Column } from '../components';
 
 interface User {
   id: number;
@@ -37,14 +36,6 @@ const sampleData: User[] = [
     status: 'inactive',
     lastLogin: '2024-01-10'
   },
-  {
-    id: 4,
-    name: 'Alice Brown',
-    email: 'alice@example.com',
-    role: 'User',
-    status: 'active',
-    lastLogin: '2024-01-16'
-  },
 ];
 
 const columns: Column<User>[] = [
@@ -53,26 +44,23 @@ const columns: Column<User>[] = [
     title: 'Name',
     dataIndex: 'name',
     sortable: true,
-    width: '200px'
   },
   {
     key: 'email',
     title: 'Email',
     dataIndex: 'email',
     sortable: true,
-    width: '250px'
   },
   {
     key: 'role',
     title: 'Role',
     dataIndex: 'role',
     sortable: true,
-    width: '150px',
     render: (value: string) => (
       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-        value === 'Admin' ? 'bg-destructive/10 text-destructive' :
-        value === 'Moderator' ? 'bg-warning/10 text-warning' :
-        'bg-primary/10 text-primary'
+        value === 'Admin' ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400' :
+        value === 'Moderator' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400' :
+        'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
       }`}>
         {value}
       </span>
@@ -83,10 +71,11 @@ const columns: Column<User>[] = [
     title: 'Status',
     dataIndex: 'status',
     sortable: true,
-    width: '120px',
     render: (value: string) => (
       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-        value === 'active' ? 'bg-success/10 text-success' : 'bg-muted text-muted-foreground'
+        value === 'active' 
+          ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' 
+          : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
       }`}>
         {value}
       </span>
@@ -101,35 +90,13 @@ const columns: Column<User>[] = [
   }
 ];
 
-const meta: Meta<typeof DataTable<User>> = {
+const meta: Meta<typeof DataTable> = {
   title: 'Components/DataTable',
   component: DataTable,
   parameters: {
     layout: 'padded',
-    docs: {
-      description: {
-        component: 'A feature-rich data table component with sorting, selection, loading states, and custom cell rendering.',
-      },
-    },
   },
   tags: ['autodocs'],
-  argTypes: {
-    loading: {
-      control: 'boolean',
-      description: 'Whether the table is in loading state',
-    },
-    selectable: {
-      control: 'boolean',
-      description: 'Whether rows can be selected',
-    },
-    emptyMessage: {
-      control: 'text',
-      description: 'Message to display when no data is available',
-    },
-  },
-  args: {
-    // onRowSelect: action('onRowSelect'),
-  },
 };
 
 export default meta;
@@ -147,6 +114,7 @@ export const WithSelection: Story = {
     data: sampleData,
     columns: columns,
     selectable: true,
+    onRowSelect: (selectedRows) => console.log('Selected:', selectedRows),
   },
 };
 
@@ -155,57 +123,38 @@ export const Loading: Story = {
     data: sampleData,
     columns: columns,
     loading: true,
-    selectable: true,
   },
 };
 
-export const EmptyState: Story = {
+export const Empty: Story = {
   args: {
     data: [],
     columns: columns,
-    selectable: true,
-    emptyMessage: 'No users found. Try adding some data!',
+    emptyMessage: 'No users found',
   },
 };
 
-export const CustomEmptyMessage: Story = {
-  args: {
-    data: [],
-    columns: columns,
-    emptyMessage: 'Your custom empty state message here',
-  },
-};
-
-export const SimpleColumns: Story = {
+export const CustomRendering: Story = {
   args: {
     data: sampleData,
     columns: [
+      ...columns,
       {
-        key: 'name',
-        title: 'Name',
-        dataIndex: 'name',
-        sortable: true,
-      },
-      {
-        key: 'email',
-        title: 'Email',
-        dataIndex: 'email',
-        sortable: true,
-      },
-      {
-        key: 'role',
-        title: 'Role',
-        dataIndex: 'role',
-        sortable: false,
-      },
+        key: 'actions',
+        title: 'Actions',
+        dataIndex: 'id',
+        render: (value: number) => (
+          <div className="space-x-2">
+            <button className="text-blue-600 hover:text-blue-800 text-sm">
+              Edit
+            </button>
+            <button className="text-red-600 hover:text-red-800 text-sm">
+              Delete
+            </button>
+          </div>
+        )
+      }
     ],
     selectable: true,
-  },
-};
-
-export const NonSortable: Story = {
-  args: {
-    data: sampleData,
-    columns: columns.map(col => ({ ...col, sortable: false })),
   },
 };

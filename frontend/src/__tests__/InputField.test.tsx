@@ -2,186 +2,157 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import InputField from '../components/InputField';
 
-// Mock Lucide icons
-vi.mock('lucide-react', () => ({
-  Eye: () => <div data-testid="eye-icon">Eye</div>,
-  EyeOff: () => <div data-testid="eye-off-icon">EyeOff</div>,
-  X: () => <div data-testid="x-icon">X</div>,
-  Loader2: () => <div data-testid="loader-icon">Loader</div>,
-}));
-
 describe('InputField', () => {
-  it('renders basic input field', () => {
+  it('renders with label and placeholder', () => {
     render(
       <InputField 
-        label="Test Label" 
-        placeholder="Test placeholder" 
+        label="Email" 
+        placeholder="Enter your email" 
       />
     );
     
-    expect(screen.getByLabelText('Test Label')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Test placeholder')).toBeInTheDocument();
+    expect(screen.getByLabelText('Email')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Enter your email')).toBeInTheDocument();
   });
 
-  it('shows helper text', () => {
+  it('handles value changes', () => {
+    const handleChange = vi.fn();
     render(
       <InputField 
-        label="Test Label" 
-        helperText="This is helper text" 
+        value="test" 
+        onChange={handleChange} 
+        label="Test Input"
       />
     );
     
-    expect(screen.getByText('This is helper text')).toBeInTheDocument();
+    const input = screen.getByDisplayValue('test');
+    fireEvent.change(input, { target: { value: 'new value' } });
+    
+    expect(handleChange).toHaveBeenCalled();
   });
 
-  it('shows error message and applies error styles', () => {
+  it('shows error message when invalid', () => {
     render(
       <InputField 
-        label="Test Label" 
-        errorMessage="This is an error" 
+        label="Email"
         invalid
+        errorMessage="Email is required"
       />
     );
     
-    expect(screen.getByText('This is an error')).toBeInTheDocument();
-    expect(screen.getByText('This is an error')).toHaveClass('text-destructive');
+    expect(screen.getByText('Email is required')).toBeInTheDocument();
   });
 
-  it('calls onChange when input value changes', () => {
-    const handleChange = vi.fn();
+  it('shows helper text when provided', () => {
     render(
       <InputField 
-        label="Test Label" 
-        onChange={handleChange}
+        label="Password"
+        helperText="Must be at least 8 characters"
       />
     );
     
-    const input = screen.getByLabelText('Test Label');
-    fireEvent.change(input, { target: { value: 'test value' } });
-    
-    expect(handleChange).toHaveBeenCalledWith(
-      expect.objectContaining({
-        target: expect.objectContaining({ value: 'test value' })
-      })
-    );
+    expect(screen.getByText('Must be at least 8 characters')).toBeInTheDocument();
   });
 
-  it('shows clear button when clearable and has value', () => {
+  it('disables input when disabled prop is true', () => {
     render(
       <InputField 
-        label="Test Label" 
-        value="test value"
-        clearable
-      />
-    );
-    
-    expect(screen.getByTestId('x-icon')).toBeInTheDocument();
-  });
-
-  it('calls onClear when clear button is clicked', () => {
-    const handleClear = vi.fn();
-    const handleChange = vi.fn();
-    
-    render(
-      <InputField 
-        label="Test Label" 
-        value="test value"
-        clearable
-        onClear={handleClear}
-        onChange={handleChange}
-      />
-    );
-    
-    const clearButton = screen.getByTestId('x-icon').closest('button');
-    fireEvent.click(clearButton!);
-    
-    expect(handleClear).toHaveBeenCalled();
-    expect(handleChange).toHaveBeenCalledWith(
-      expect.objectContaining({
-        target: expect.objectContaining({ value: '' })
-      })
-    );
-  });
-
-  it('shows password toggle button when showPasswordToggle is true', () => {
-    render(
-      <InputField 
-        label="Password" 
-        showPasswordToggle
-      />
-    );
-    
-    expect(screen.getByTestId('eye-icon')).toBeInTheDocument();
-  });
-
-  it('toggles password visibility when toggle button is clicked', () => {
-    render(
-      <InputField 
-        label="Password" 
-        showPasswordToggle
-        value="password"
-      />
-    );
-    
-    const input = screen.getByLabelText('Password') as HTMLInputElement;
-    const toggleButton = screen.getByTestId('eye-icon').closest('button');
-    
-    // Initially password type
-    expect(input.type).toBe('password');
-    
-    // Click to show password
-    fireEvent.click(toggleButton!);
-    expect(input.type).toBe('text');
-    expect(screen.getByTestId('eye-off-icon')).toBeInTheDocument();
-    
-    // Click to hide password
-    fireEvent.click(toggleButton!);
-    expect(input.type).toBe('password');
-    expect(screen.getByTestId('eye-icon')).toBeInTheDocument();
-  });
-
-  it('shows loading spinner when loading is true', () => {
-    render(
-      <InputField 
-        label="Test Label" 
-        loading
-      />
-    );
-    
-    expect(screen.getByTestId('loader-icon')).toBeInTheDocument();
-  });
-
-  it('disables input when disabled is true', () => {
-    render(
-      <InputField 
-        label="Test Label" 
+        label="Disabled Input"
         disabled
       />
     );
     
-    const input = screen.getByLabelText('Test Label');
-    expect(input).toBeDisabled();
+    expect(screen.getByLabelText('Disabled Input')).toBeDisabled();
+  });
+
+  it('shows clear button when clearable and has value', () => {
+    const handleClear = vi.fn();
+    render(
+      <InputField 
+        label="Search"
+        value="test"
+        clearable
+        onClear={handleClear}
+      />
+    );
+    
+    const clearButton = screen.getByLabelText('Clear input');
+    expect(clearButton).toBeInTheDocument();
+    
+    fireEvent.click(clearButton);
+    expect(handleClear).toHaveBeenCalled();
+  });
+
+  it('shows password toggle when showPasswordToggle is true', () => {
+    render(
+      <InputField 
+        label="Password"
+        showPasswordToggle
+      />
+    );
+    
+    expect(screen.getByLabelText('Show password')).toBeInTheDocument();
+  });
+
+  it('toggles password visibility', () => {
+    render(
+      <InputField 
+        label="Password"
+        showPasswordToggle
+      />
+    );
+    
+    const input = screen.getByLabelText('Password') as HTMLInputElement;
+    const toggleButton = screen.getByLabelText('Show password');
+    
+    expect(input.type).toBe('password');
+    
+    fireEvent.click(toggleButton);
+    expect(input.type).toBe('text');
+    expect(screen.getByLabelText('Hide password')).toBeInTheDocument();
+  });
+
+  it('applies correct variant classes', () => {
+    const { rerender } = render(
+      <InputField 
+        label="Test"
+        variant="outlined"
+      />
+    );
+    
+    let input = screen.getByLabelText('Test');
+    expect(input).toHaveClass('border-2');
+    
+    rerender(
+      <InputField 
+        label="Test"
+        variant="filled"
+      />
+    );
+    
+    input = screen.getByLabelText('Test');
+    expect(input).toHaveClass('border-0');
   });
 
   it('applies correct size classes', () => {
     const { rerender } = render(
       <InputField 
-        label="Test Label" 
+        label="Test"
         size="sm"
       />
     );
     
-    let input = screen.getByLabelText('Test Label');
-    expect(input).toHaveClass('h-8');
+    let input = screen.getByLabelText('Test');
+    expect(input).toHaveClass('px-3', 'py-2', 'text-sm');
     
     rerender(
       <InputField 
-        label="Test Label" 
+        label="Test"
         size="lg"
       />
     );
     
-    input = screen.getByLabelText('Test Label');
-    expect(input).toHaveClass('h-12');
+    input = screen.getByLabelText('Test');
+    expect(input).toHaveClass('px-5', 'py-4', 'text-lg');
   });
 });

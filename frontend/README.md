@@ -1,66 +1,65 @@
 # React Component Library
 
-A modern React component library built with TypeScript, Tailwind CSS, and Storybook. Features two comprehensive components: InputField and DataTable.
+A modern React component library built with TypeScript, Tailwind CSS, and Storybook. Features two main components: InputField and DataTable.
 
 ## 🚀 Quick Start
 
-### Installation
-
 ```bash
-# Clone the repository
-git clone <your-repo-url>
-cd react-component-library
-
 # Install dependencies
 npm install
 
 # Start development server
 npm run dev
 
-# Start Storybook
+# Run Storybook
 npm run storybook
+
+# Run tests
+npm test
 ```
 
-### Usage
-
-```tsx
-import { InputField, DataTable } from './components';
-
-// InputField example
-<InputField
-  label="Email"
-  placeholder="Enter your email"
-  variant="outlined"
-  size="md"
-  clearable
-/>
-
-// DataTable example
-<DataTable
-  data={users}
-  columns={userColumns}
-  selectable
-  onRowSelect={(selectedRows) => console.log(selectedRows)}
-/>
-```
-
-## 📋 Components
+## 📦 Components
 
 ### InputField
 
-A flexible input component with validation states and multiple features.
+A flexible input component with multiple variants, sizes, and interactive features.
 
 #### Features
-- ✅ Multiple variants: `filled`, `outlined`, `ghost`
-- ✅ Three sizes: `sm`, `md`, `lg`
-- ✅ Validation states: `disabled`, `invalid`, `loading`
-- ✅ Clear button functionality
-- ✅ Password visibility toggle
-- ✅ Helper text and error messages
-- ✅ Fully accessible with ARIA labels
-- ✅ TypeScript support
+- **Variants**: outlined, filled, ghost
+- **Sizes**: small, medium, large
+- **States**: disabled, invalid, loading
+- **Interactive**: clearable, password toggle
+- **Validation**: error messages, helper text
+- **Accessibility**: ARIA labels, keyboard navigation
+
+#### Usage
+
+```tsx
+import { InputField } from './components';
+
+// Basic usage
+<InputField
+  label="Email"
+  placeholder="Enter your email"
+  helperText="We'll never share your email"
+/>
+
+// With validation
+<InputField
+  label="Password"
+  type="password"
+  invalid={hasError}
+  errorMessage="Password is required"
+  showPasswordToggle
+/>
+
+// Different variants and sizes
+<InputField variant="filled" size="lg" />
+<InputField variant="ghost" size="sm" />
+```
 
 #### Props
+
 ```tsx
 interface InputFieldProps {
   value?: string;
@@ -71,29 +70,89 @@ interface InputFieldProps {
   errorMessage?: string;
   disabled?: boolean;
   invalid?: boolean;
-  loading?: boolean;
   variant?: 'filled' | 'outlined' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
+  type?: string;
+  loading?: boolean;
   clearable?: boolean;
-  showPasswordToggle?: boolean;
   onClear?: () => void;
+  showPasswordToggle?: boolean;
+  className?: string;
 }
 ```
 
 ### DataTable
 
-A feature-rich data table component with sorting and selection.
+An advanced data table component with sorting, selection, and custom rendering.
 
 #### Features
-- ✅ Column sorting (ascending/descending/none)
-- ✅ Row selection (single/multiple)
-- ✅ Loading states
-- ✅ Empty state handling
-- ✅ Custom cell rendering
-- ✅ Responsive design
-- ✅ TypeScript generics for type safety
+- **Sorting**: Click column headers to sort data
+- **Selection**: Single or multiple row selection
+- **Custom Rendering**: Custom cell content with render functions
+- **States**: loading, empty state
+- **Responsive**: Horizontal scroll on small screens
+- **Accessibility**: Keyboard navigation, screen reader support
+
+#### Usage
+
+```tsx
+import { DataTable } from './components';
+import type { Column } from './components';
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  status: 'active' | 'inactive';
+}
+
+const columns: Column<User>[] = [
+  {
+    key: 'name',
+    title: 'Name',
+    dataIndex: 'name',
+    sortable: true,
+  },
+  {
+    key: 'email',
+    title: 'Email',
+    dataIndex: 'email',
+    sortable: true,
+  },
+  {
+    key: 'status',
+    title: 'Status',
+    dataIndex: 'status',
+    render: (value) => (
+      <span className={value === 'active' ? 'text-green-600' : 'text-red-600'}>
+        {value}
+      </span>
+    ),
+  },
+];
+
+const data: User[] = [
+  { id: 1, name: 'John Doe', email: 'john@example.com', status: 'active' },
+  // ... more data
+];
+
+// Basic usage
+<DataTable data={data} columns={columns} />
+
+// With selection
+<DataTable
+  data={data}
+  columns={columns}
+  selectable
+  onRowSelect={(selectedRows) => console.log(selectedRows)}
+/>
+
+// With loading state
+<DataTable data={data} columns={columns} loading />
+```
 
 #### Props
+
 ```tsx
 interface DataTableProps<T> {
   data: T[];
@@ -101,8 +160,8 @@ interface DataTableProps<T> {
   loading?: boolean;
   selectable?: boolean;
   onRowSelect?: (selectedRows: T[]) => void;
+  className?: string;
   emptyMessage?: string;
-  rowKey?: keyof T | ((record: T) => string | number);
 }
 
 interface Column<T> {
@@ -115,40 +174,31 @@ interface Column<T> {
 }
 ```
 
-## 🎨 Design System
+## 🎨 Theme Support
 
-The components use a comprehensive design system built with CSS custom properties and Tailwind CSS:
+Both components support light and dark themes through CSS custom properties.
 
-- **Colors**: Semantic color tokens for consistent theming
-- **Spacing**: Standardized spacing scale
-- **Typography**: Consistent font sizes and weights
-- **Shadows**: Subtle shadow system for depth
-- **Transitions**: Smooth animations and interactions
+```tsx
+import { ThemeProvider, ThemeToggle } from './components';
 
-## 📖 Storybook
-
-Interactive component documentation and testing playground.
-
-### Available Scripts
-
-```bash
-# Start Storybook development server
-npm run storybook
-
-# Build Storybook for production
-npm run build-storybook
+function App() {
+  return (
+    <ThemeProvider defaultTheme="system">
+      <div className="app">
+        <ThemeToggle />
+        {/* Your components */}
+      </div>
+    </ThemeProvider>
+  );
+}
 ```
-
-### Stories Include:
-- **InputField**: All variants, sizes, states, and features
-- **DataTable**: Different configurations, loading states, and custom rendering
 
 ## 🧪 Testing
 
-Comprehensive test suite using Vitest and React Testing Library.
+Components are thoroughly tested with Vitest and React Testing Library:
 
 ```bash
-# Run tests
+# Run all tests
 npm test
 
 # Run tests in watch mode
@@ -158,98 +208,48 @@ npm run test:watch
 npm run test:coverage
 ```
 
-### Test Coverage
-- ✅ Component rendering
-- ✅ User interactions
-- ✅ Prop validation
-- ✅ Event handling
-- ✅ State management
+## 📚 Storybook
+
+Interactive component documentation and playground:
+
+```bash
+# Start Storybook
+npm run storybook
+
+# Build Storybook
+npm run build-storybook
+```
 
 ## 🏗️ Architecture
 
 ### Project Structure
 ```
 src/
-├── components/           # Core components
-│   ├── InputField.tsx   # Input field component
-│   ├── DataTable.tsx    # Data table component
-│   └── index.ts         # Component exports
+├── components/           # Component implementations
+│   ├── InputField.tsx   # Input component
+│   ├── DataTable.tsx    # Table component
+│   ├── ThemeProvider.tsx # Theme context
+│   └── index.ts         # Exports
 ├── stories/             # Storybook stories
-├── __tests__/           # Test files
-├── pages/               # Demo pages
-└── lib/                 # Utilities
+├── __tests__/           # Component tests
+└── pages/               # Demo pages
 ```
 
 ### Design Principles
-- **Composability**: Components are designed to work together
-- **Accessibility**: ARIA labels and keyboard navigation
-- **Performance**: Optimized rendering and minimal re-renders
-- **Type Safety**: Full TypeScript support with proper generics
-- **Maintainability**: Clean code structure and documentation
+- **TypeScript First**: Full type safety with proper interfaces
+- **Accessibility**: ARIA labels, keyboard navigation, screen reader support
+- **Responsive**: Mobile-first design with Tailwind CSS
+- **Customizable**: Flexible props and styling options
+- **Testable**: Comprehensive test coverage
+- **Documented**: Storybook stories with examples
 
-## 🎯 Key Features
+## 🎯 Browser Support
 
-### Accessibility
-- Proper ARIA labels and roles
-- Keyboard navigation support
-- Screen reader compatibility
-- Focus management
-- Color contrast compliance
-
-### Performance
-- Memoized computations
-- Optimized re-rendering
-- Lazy loading for large datasets
-- Efficient event handling
-
-### Developer Experience
-- Full TypeScript support
-- Comprehensive documentation
-- Interactive Storybook
-- Unit test coverage
-- ESLint and Prettier configuration
-
-## 🚀 Deployment
-
-### Storybook Deployment
-Deploy to Vercel or Chromatic for easy sharing:
-
-```bash
-# Build Storybook
-npm run build-storybook
-
-# Deploy to Vercel
-vercel deploy storybook-static
-
-# Or use Chromatic
-npx chromatic --project-token=<your-token>
-```
-
-## 🛠️ Tech Stack
-
-- **React 18** with Hooks and functional components
-- **TypeScript** for type safety
-- **Tailwind CSS** for styling
-- **Storybook** for component documentation
-- **Vitest** for testing
-- **React Testing Library** for component testing
-- **Vite** for build tooling
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
 
 ## 📄 License
 
-MIT License - feel free to use this in your projects!
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Ensure all tests pass
-6. Submit a pull request
-
-## 🔗 Links
-
-- [Component Demo](/) - Live demo of all components
-- [Storybook]() - Interactive component documentation
-- [GitHub Repository]() - Source code and issues
+MIT License - feel free to use in your projects!

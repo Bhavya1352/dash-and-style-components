@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { cn } from '@/lib/utils';
-import { ChevronUp, ChevronDown, Check, Loader2 } from 'lucide-react';
+import { ChevronUp, ChevronDown, Loader2 } from 'lucide-react';
 
 export interface Column<T> {
   key: string;
@@ -19,260 +18,185 @@ export interface DataTableProps<T> {
   onRowSelect?: (selectedRows: T[]) => void;
   className?: string;
   emptyMessage?: string;
-  rowKey?: keyof T | ((record: T) => string | number);
 }
 
-type SortDirection = 'asc' | 'desc' | null;
+type SortOrder = 'asc' | 'desc' | null;
 
-interface SortState {
-  column: string | null;
-  direction: SortDirection;
-}
-
-function DataTable<T extends Record<string, any>>({
+const DataTable = <T extends Record<string, any>>({
   data,
   columns,
   loading = false,
   selectable = false,
   onRowSelect,
-  className,
-  emptyMessage = "No data available",
-  rowKey = 'id'
-}: DataTableProps<T>) {
-  const [selectedRows, setSelectedRows] = useState<Set<string | number>>(new Set());
-  const [sortState, setSortState] = useState<SortState>({ column: null, direction: null });
+  className = '',
+  emptyMessage = 'No data available',
+}: DataTableProps<T>) => {
+  const [selectedRows, setSelectedRows] = useState<T[]>([]);
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<SortOrder>(null);
 
-  // Get row key for a record
-  const getRowKey = (record: T, index: number): string | number => {
-    if (typeof rowKey === 'function') {
-      return rowKey(record);
-    }
-    return record[rowKey] ?? index;
-  };
-
-  // Sort data based on current sort state
+  // Sort data
   const sortedData = useMemo(() => {
-    if (!sortState.column || !sortState.direction) {
-      return data;
-    }
-
-    const column = columns.find(col => col.key === sortState.column);
-    if (!column) return data;
+    if (!sortColumn || !sortOrder) return data;
 
     return [...data].sort((a, b) => {
-      const aValue = a[column.dataIndex];
-      const bValue = b[column.dataIndex];
+      const aValue = a[sortColumn];
+      const bValue = b[sortColumn];
 
-      if (aValue === bValue) return 0;
-      
-      let comparison = 0;
-      if (aValue > bValue) comparison = 1;
-      if (aValue < bValue) comparison = -1;
-
-      return sortState.direction === 'desc' ? -comparison : comparison;
+      if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
     });
-  }, [data, sortState, columns]);
+  }, [data, sortColumn, sortOrder]);
 
-  // Handle sorting
-  const handleSort = (column: Column<T>) => {
-    if (!column.sortable) return;
-
-    setSortState(prevState => {
-      if (prevState.column === column.key) {
-        // Same column: cycle through asc -> desc -> null
-        const newDirection: SortDirection = 
-          prevState.direction === 'asc' ? 'desc' :
-          prevState.direction === 'desc' ? null : 'asc';
-        return { column: newDirection ? column.key : null, direction: newDirection };
-      } else {
-        // Different column: start with asc
-        return { column: column.key, direction: 'asc' };
+  const handleSort = (columnKey: string) => {
+    if (sortColumn === columnKey) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : sortOrder === 'desc' ? null : 'asc');
+      if (sortOrder === 'desc') {
+        setSortColumn(null);
       }
-    });
+    } else {
+      setSortColumn(columnKey);
+      setSortOrder('asc');
+    }
   };
 
-  // Handle row selection
-  const handleRowSelect = (record: T, index: number) => {
-    if (!selectable) return;
-
-    const key = getRowKey(record, index);
-    const newSelectedRows = new Set(selectedRows);
+  const handleRowSelect = (row: T, checked: boolean) => {
+    let newSelectedRows: T[];
     
-    if (newSelectedRows.has(key)) {
-      newSelectedRows.delete(key);
+    if (checked) {
+      newSelectedRows = [...selectedRows, row];
     } else {
-      newSelectedRows.add(key);
+      newSelectedRows = selectedRows.filter(selectedRow => selectedRow !== row);
     }
     
     setSelectedRows(newSelectedRows);
-    
-    // Call onRowSelect with the actual row data
-    const selectedData = sortedData.filter((row, idx) => 
-      newSelectedRows.has(getRowKey(row, idx))
-    );
-    onRowSelect?.(selectedData);
+    onRowSelect?.(newSelectedRows);
   };
 
-  // Handle select all
-  const handleSelectAll = () => {
-    if (!selectable) return;
-
-    const allKeys = sortedData.map((record, index) => getRowKey(record, index));
-    const isAllSelected = allKeys.every(key => selectedRows.has(key));
-    
-    if (isAllSelected) {
-      setSelectedRows(new Set());
-      onRowSelect?.([]);
-    } else {
-      const newSelectedRows = new Set(allKeys);
-      setSelectedRows(newSelectedRows);
-      onRowSelect?.(sortedData);
-    }
+  const handleSelectAll = (checked: boolean) => {
+    const newSelectedRows = checked ? [...sortedData] : [];
+    setSelectedRows(newSelectedRows);
+    onRowSelect?.(newSelectedRows);
   };
 
-  // Check if all rows are selected
-  const isAllSelected = sortedData.length > 0 && 
-    sortedData.every((record, index) => selectedRows.has(getRowKey(record, index)));
-  
-  // Check if some rows are selected
-  const isSomeSelected = selectedRows.size > 0 && !isAllSelected;
+  const isRowSelected = (row: T) => selectedRows.includes(row);
+  const isAllSelected = sortedData.length > 0 && selectedRows.length === sortedData.length;
+  const isIndeterminate = selectedRows.length > 0 && selectedRows.length < sortedData.length;
 
-  const getSortIcon = (column: Column<T>) => {
-    if (!column.sortable) return null;
-    
-    const isActive = sortState.column === column.key;
-    
-    if (!isActive) {
-      return (
-        <div className="flex flex-col ml-1">
-          <ChevronUp className="h-3 w-3 text-muted-foreground/50" />
-          <ChevronDown className="h-3 w-3 text-muted-foreground/50 -mt-1" />
-        </div>
-      );
-    }
-    
+  if (loading) {
     return (
-      <div className="flex flex-col ml-1">
-        <ChevronUp className={cn(
-          "h-3 w-3 -mb-1",
-          sortState.direction === 'asc' ? 'text-primary' : 'text-muted-foreground/50'
-        )} />
-        <ChevronDown className={cn(
-          "h-3 w-3",
-          sortState.direction === 'desc' ? 'text-primary' : 'text-muted-foreground/50'
-        )} />
+      <div className={`border border-gray-200 dark:border-gray-700 rounded-lg ${className}`}>
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+          <span className="ml-2 text-gray-500 dark:text-gray-400">Loading...</span>
+        </div>
       </div>
     );
-  };
+  }
 
   return (
-    <div className={cn('rounded-md border shadow-sm bg-card', className)}>
+    <div className={`border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden ${className}`}>
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead>
-            <tr className="border-b bg-muted/50">
+          <thead className="bg-gray-50 dark:bg-gray-800">
+            <tr>
               {selectable && (
-                <th className="w-12 p-4 text-left">
-                  <div className="flex items-center justify-center">
-                    <button
-                      onClick={handleSelectAll}
-                      disabled={loading || data.length === 0}
-                      className={cn(
-                        "w-4 h-4 rounded border border-input flex items-center justify-center transition-colors",
-                        "hover:border-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-                        isAllSelected && "bg-primary border-primary",
-                        isSomeSelected && "bg-primary border-primary",
-                        loading && "opacity-50 cursor-not-allowed"
-                      )}
-                    >
-                      {isAllSelected && <Check className="h-3 w-3 text-primary-foreground" />}
-                      {isSomeSelected && (
-                        <div className="w-2 h-2 bg-primary-foreground rounded-sm" />
-                      )}
-                    </button>
-                  </div>
+                <th className="px-4 py-3 text-left">
+                  <input
+                    type="checkbox"
+                    checked={isAllSelected}
+                    ref={(input) => {
+                      if (input) input.indeterminate = isIndeterminate;
+                    }}
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                    aria-label="Select all rows"
+                  />
                 </th>
               )}
               {columns.map((column) => (
                 <th
                   key={column.key}
+                  className={`px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider ${
+                    column.sortable ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700' : ''
+                  }`}
                   style={{ width: column.width }}
-                  className={cn(
-                    "p-4 text-left font-medium text-muted-foreground",
-                    column.sortable && "cursor-pointer hover:text-foreground transition-colors"
-                  )}
-                  onClick={() => handleSort(column)}
+                  onClick={() => column.sortable && handleSort(column.key)}
                 >
-                  <div className="flex items-center">
+                  <div className="flex items-center space-x-1">
                     <span>{column.title}</span>
-                    {getSortIcon(column)}
+                    {column.sortable && (
+                      <div className="flex flex-col">
+                        <ChevronUp 
+                          className={`w-3 h-3 ${
+                            sortColumn === column.key && sortOrder === 'asc' 
+                              ? 'text-blue-600' 
+                              : 'text-gray-400'
+                          }`} 
+                        />
+                        <ChevronDown 
+                          className={`w-3 h-3 -mt-1 ${
+                            sortColumn === column.key && sortOrder === 'desc' 
+                              ? 'text-blue-600' 
+                              : 'text-gray-400'
+                          }`} 
+                        />
+                      </div>
+                    )}
                   </div>
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody>
-            {loading ? (
+          <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+            {sortedData.length === 0 ? (
               <tr>
-                <td colSpan={columns.length + (selectable ? 1 : 0)} className="p-8 text-center">
-                  <div className="flex items-center justify-center space-x-2">
-                    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                    <span className="text-muted-foreground">Loading...</span>
-                  </div>
-                </td>
-              </tr>
-            ) : sortedData.length === 0 ? (
-              <tr>
-                <td colSpan={columns.length + (selectable ? 1 : 0)} className="p-8 text-center">
-                  <div className="text-muted-foreground">{emptyMessage}</div>
+                <td 
+                  colSpan={columns.length + (selectable ? 1 : 0)} 
+                  className="px-4 py-12 text-center text-gray-500 dark:text-gray-400"
+                >
+                  {emptyMessage}
                 </td>
               </tr>
             ) : (
-              sortedData.map((record, index) => {
-                const key = getRowKey(record, index);
-                const isSelected = selectedRows.has(key);
-                
-                return (
-                  <tr
-                    key={key}
-                    className={cn(
-                      "border-b hover:bg-muted/50 transition-colors",
-                      isSelected && "bg-muted/30",
-                      selectable && "cursor-pointer"
-                    )}
-                    onClick={() => selectable && handleRowSelect(record, index)}
-                  >
-                    {selectable && (
-                      <td className="w-12 p-4">
-                        <div className="flex items-center justify-center">
-                          <div
-                            className={cn(
-                              "w-4 h-4 rounded border border-input flex items-center justify-center transition-colors",
-                              isSelected && "bg-primary border-primary"
-                            )}
-                          >
-                            {isSelected && <Check className="h-3 w-3 text-primary-foreground" />}
-                          </div>
-                        </div>
-                      </td>
-                    )}
-                    {columns.map((column) => (
-                      <td key={column.key} className="p-4 text-foreground">
-                        {column.render
-                          ? column.render(record[column.dataIndex], record, index)
-                          : String(record[column.dataIndex] ?? '')
-                        }
-                      </td>
-                    ))}
-                  </tr>
-                );
-              })
+              sortedData.map((row, index) => (
+                <tr 
+                  key={index}
+                  className={`hover:bg-gray-50 dark:hover:bg-gray-800 ${
+                    isRowSelected(row) ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+                  }`}
+                >
+                  {selectable && (
+                    <td className="px-4 py-4">
+                      <input
+                        type="checkbox"
+                        checked={isRowSelected(row)}
+                        onChange={(e) => handleRowSelect(row, e.target.checked)}
+                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        aria-label={`Select row ${index + 1}`}
+                      />
+                    </td>
+                  )}
+                  {columns.map((column) => (
+                    <td 
+                      key={column.key} 
+                      className="px-4 py-4 text-sm text-gray-900 dark:text-gray-100"
+                    >
+                      {column.render 
+                        ? column.render(row[column.dataIndex], row, index)
+                        : String(row[column.dataIndex] || '')
+                      }
+                    </td>
+                  ))}
+                </tr>
+              ))
             )}
           </tbody>
         </table>
       </div>
     </div>
   );
-}
+};
 
 export default DataTable;

@@ -3,72 +3,41 @@ import { describe, it, expect, vi } from 'vitest';
 import DataTable from '../components/DataTable';
 import type { Column } from '../components/DataTable';
 
-// Mock Lucide icons
-vi.mock('lucide-react', () => ({
-  ChevronUp: () => <div data-testid="chevron-up">ChevronUp</div>,
-  ChevronDown: () => <div data-testid="chevron-down">ChevronDown</div>,
-  Check: () => <div data-testid="check-icon">Check</div>,
-  Loader2: () => <div data-testid="loader-icon">Loader</div>,
-}));
-
 interface TestData {
   id: number;
   name: string;
   email: string;
-  age: number;
+  status: string;
 }
 
 const testData: TestData[] = [
-  { id: 1, name: 'John Doe', email: 'john@example.com', age: 30 },
-  { id: 2, name: 'Jane Smith', email: 'jane@example.com', age: 25 },
-  { id: 3, name: 'Bob Johnson', email: 'bob@example.com', age: 35 },
+  { id: 1, name: 'John Doe', email: 'john@example.com', status: 'active' },
+  { id: 2, name: 'Jane Smith', email: 'jane@example.com', status: 'inactive' },
+  { id: 3, name: 'Bob Johnson', email: 'bob@example.com', status: 'active' },
 ];
 
 const testColumns: Column<TestData>[] = [
-  {
-    key: 'name',
-    title: 'Name',
-    dataIndex: 'name',
-    sortable: true,
-  },
-  {
-    key: 'email',
-    title: 'Email',
-    dataIndex: 'email',
-    sortable: true,
-  },
-  {
-    key: 'age',
-    title: 'Age',
-    dataIndex: 'age',
-    sortable: false,
-  },
+  { key: 'name', title: 'Name', dataIndex: 'name', sortable: true },
+  { key: 'email', title: 'Email', dataIndex: 'email', sortable: true },
+  { key: 'status', title: 'Status', dataIndex: 'status' },
 ];
 
 describe('DataTable', () => {
   it('renders table with data', () => {
-    render(
-      <DataTable data={testData} columns={testColumns} />
-    );
+    render(<DataTable data={testData} columns={testColumns} />);
     
-    // Check headers
     expect(screen.getByText('Name')).toBeInTheDocument();
     expect(screen.getByText('Email')).toBeInTheDocument();
-    expect(screen.getByText('Age')).toBeInTheDocument();
+    expect(screen.getByText('Status')).toBeInTheDocument();
     
-    // Check data
     expect(screen.getByText('John Doe')).toBeInTheDocument();
     expect(screen.getByText('jane@example.com')).toBeInTheDocument();
-    expect(screen.getByText('35')).toBeInTheDocument();
   });
 
   it('shows loading state', () => {
-    render(
-      <DataTable data={testData} columns={testColumns} loading />
-    );
+    render(<DataTable data={testData} columns={testColumns} loading />);
     
     expect(screen.getByText('Loading...')).toBeInTheDocument();
-    expect(screen.getByTestId('loader-icon')).toBeInTheDocument();
   });
 
   it('shows empty state when no data', () => {
@@ -76,82 +45,57 @@ describe('DataTable', () => {
       <DataTable 
         data={[]} 
         columns={testColumns} 
-        emptyMessage="No data available" 
+        emptyMessage="No data found"
       />
     );
     
-    expect(screen.getByText('No data available')).toBeInTheDocument();
+    expect(screen.getByText('No data found')).toBeInTheDocument();
   });
 
-  it('renders selection checkboxes when selectable', () => {
-    render(
-      <DataTable data={testData} columns={testColumns} selectable />
-    );
-    
-    const checkboxes = screen.getAllByRole('button');
-    // Should have header checkbox + one per row
-    expect(checkboxes).toHaveLength(testData.length + 1);
-  });
-
-  it('calls onRowSelect when row is selected', () => {
+  it('handles row selection', () => {
     const handleRowSelect = vi.fn();
     render(
       <DataTable 
         data={testData} 
         columns={testColumns} 
-        selectable 
+        selectable
         onRowSelect={handleRowSelect}
       />
     );
     
-    // Click on first row
-    const firstRow = screen.getByText('John Doe').closest('tr');
-    fireEvent.click(firstRow!);
+    const checkboxes = screen.getAllByRole('checkbox');
+    expect(checkboxes).toHaveLength(4); // 3 rows + 1 select all
     
+    fireEvent.click(checkboxes[1]); // Click first row checkbox
     expect(handleRowSelect).toHaveBeenCalledWith([testData[0]]);
   });
 
-  it('sorts data when sortable column header is clicked', () => {
-    render(
-      <DataTable data={testData} columns={testColumns} />
-    );
-    
-    const nameHeader = screen.getByText('Name').closest('th');
-    fireEvent.click(nameHeader!);
-    
-    // Check if data is sorted - Bob Johnson should come first alphabetically
-    const rows = screen.getAllByRole('row');
-    expect(rows[1]).toHaveTextContent('Bob Johnson');
-  });
-
-  it('does not sort when non-sortable column header is clicked', () => {
-    render(
-      <DataTable data={testData} columns={testColumns} />
-    );
-    
-    const ageHeader = screen.getByText('Age').closest('th');
-    fireEvent.click(ageHeader!);
-    
-    // Data should remain in original order
-    const rows = screen.getAllByRole('row');
-    expect(rows[1]).toHaveTextContent('John Doe');
-  });
-
-  it('selects all rows when header checkbox is clicked', () => {
+  it('handles select all functionality', () => {
     const handleRowSelect = vi.fn();
     render(
       <DataTable 
         data={testData} 
         columns={testColumns} 
-        selectable 
+        selectable
         onRowSelect={handleRowSelect}
       />
     );
     
-    const headerCheckbox = screen.getAllByRole('button')[0];
-    fireEvent.click(headerCheckbox);
+    const selectAllCheckbox = screen.getAllByRole('checkbox')[0];
+    fireEvent.click(selectAllCheckbox);
     
     expect(handleRowSelect).toHaveBeenCalledWith(testData);
+  });
+
+  it('sorts data when column header is clicked', () => {
+    render(<DataTable data={testData} columns={testColumns} />);
+    
+    const nameHeader = screen.getByText('Name');
+    fireEvent.click(nameHeader);
+    
+    const rows = screen.getAllByRole('row');
+    // After sorting by name ascending, Bob should be first
+    expect(rows[1]).toHaveTextContent('Bob Johnson');
   });
 
   it('renders custom cell content', () => {
@@ -160,29 +104,57 @@ describe('DataTable', () => {
         key: 'name',
         title: 'Name',
         dataIndex: 'name',
-        render: (value) => <strong data-testid="custom-name">{value}</strong>,
-      },
+        render: (value: string) => <strong>{value}</strong>
+      }
     ];
     
-    render(
-      <DataTable data={testData} columns={customColumns} />
-    );
+    render(<DataTable data={testData} columns={customColumns} />);
     
-    expect(screen.getByTestId('custom-name')).toBeInTheDocument();
-    expect(screen.getByTestId('custom-name')).toHaveTextContent('John Doe');
+    const strongElement = screen.getByText('John Doe').closest('strong');
+    expect(strongElement).toBeInTheDocument();
   });
 
-  it('applies correct row key', () => {
+  it('applies hover styles to rows', () => {
+    render(<DataTable data={testData} columns={testColumns} />);
+    
+    const firstDataRow = screen.getAllByRole('row')[1];
+    expect(firstDataRow).toHaveClass('hover:bg-gray-50');
+  });
+
+  it('highlights selected rows', () => {
     render(
       <DataTable 
         data={testData} 
         columns={testColumns} 
-        rowKey={(record) => `user-${record.id}`}
+        selectable
       />
     );
     
-    const rows = screen.getAllByRole('row');
-    // Should have header + data rows
-    expect(rows).toHaveLength(testData.length + 1);
+    const firstRowCheckbox = screen.getAllByRole('checkbox')[1];
+    fireEvent.click(firstRowCheckbox);
+    
+    const firstDataRow = screen.getAllByRole('row')[1];
+    expect(firstDataRow).toHaveClass('bg-blue-50');
+  });
+
+  it('handles sorting in both directions', () => {
+    render(<DataTable data={testData} columns={testColumns} />);
+    
+    const nameHeader = screen.getByText('Name');
+    
+    // First click - ascending
+    fireEvent.click(nameHeader);
+    let rows = screen.getAllByRole('row');
+    expect(rows[1]).toHaveTextContent('Bob Johnson');
+    
+    // Second click - descending
+    fireEvent.click(nameHeader);
+    rows = screen.getAllByRole('row');
+    expect(rows[1]).toHaveTextContent('John Doe');
+    
+    // Third click - no sorting
+    fireEvent.click(nameHeader);
+    rows = screen.getAllByRole('row');
+    expect(rows[1]).toHaveTextContent('John Doe'); // Back to original order
   });
 });
